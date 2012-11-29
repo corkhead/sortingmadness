@@ -15,7 +15,7 @@ Given this metric we came up with the following searches.
 
 *** Similar to the previous note, the worst-case performance of bucket sort is O(n^2) rather than O(n).  However, we expect bucket sort to perform in O(n + b) on average, where b is the total number of buckets. Assuming that the average input is relatively random such that there aren't many collisions in which URLs of different lengths get mapped to the same bucket, then b is O(n), giving an overall O(n) performance.  If we do get a lot of collisions, the bucket itself would also need to be sorted.  Bucket sort appeared to be the next-best choice since we achieve O(n) performance when there are no collisions.
 
-The intended usage of our file is "sortUrls.py -i <input file> -o <output file> [-s <sorting algorithm>]".  
+The intended usage of our file is `sortUrls.py -i <input file> -o <output file> [-s <sorting algorithm>]`.  
 The program requires that you specify an input file consisting of a line-delimited list of URLs to sort, and an output file to which to write the sorted results.  The input URLs are stripped of leading and trailing whitespace before they are sorted.  The location of the output file will be determined by 
 In addition, you may also optionally specify the sorting algorithm to use.  Otherwise, the sorting algorithm defaults to quick sort based on length (3).  The argument accepts integers corresponding to the following algorithms and orderings:
 
@@ -40,18 +40,18 @@ Since our team has seven people, we divided the jobs for this assignment into se
 * Creating the Test Suite
 * Writing the Summary Paper
 
-##URL Validation (extension)
+## URL Validation (extension)
 ### High Level Specification
 To accomodate the requirement for filtering URLs based on whether they are valid, the revised program flow is as follows:  
-1. Validate URLs, if an argument other than 'None' is specified  
+1. Validate URLs, if an argument other than `None` is specified  
 2. Normalize valid URLs  
 3. Sort the results after normalization  
 
 You can optionally specify which types of urls to sort: valid, invalid, or all urls.  
-To specify a filter on which urls to sort, simply use the command line option -f or --filter and then 'valid' or 'invalid'. To sort on all URLs, leave this argument empty.
+To specify a filter on which urls to sort, simply use the command line option `-f` or `--filter` and then `valid` or `invalid`. To sort on all URLs, leave this argument empty.
 
-If 'valid' is chosen, URLs will be normalized, then sorted and written out to file according to their normalized form (while it may be unintuitive to see, in the output, that the input is mutated, it makes our normalization method more transparent).  
-If 'invalid' is selected then we will filter all valid URLs out and then sort the remaining strings in original form.  This is because normalizing a string that is known to not be a URL does not make sense.  
+If `valid` is chosen, URLs will be normalized, then sorted and written out to file according to their normalized form (while it may be unintuitive to see, in the output, that the input is mutated, it makes our normalization method more transparent).  
+If `invalid` is selected then we will filter all valid URLs out and then sort the remaining strings in original form.  This is because normalizing a string that is known to not be a URL does not make sense.  
 If no argument is given, it will be sorted and output according to its original form.  We only normalize when the user is specifically looking for valid URLs, again because it doesn't make sense to normalize strings that the user does not want treated as URLs.
 
 ### Task Division
@@ -62,8 +62,21 @@ We divided the url sorting exercise into the following tasks:
 * Summary paper & documentation
 * Additional unit tests
 
+***
 # validateUrls.py
+The usage of the program is: `validateUrls.py -i <input file> [-c <comparison function>]`
 
+Give an input file listing URLs on each line, the program validates and normalizes the URLs.  
+Specifying a comparator (for determining if a URL is unique) is optional. Possible comparators are {alpha, length}. The default comparator is alpha.  
+For each URL, the following information is printed to console:
+
+* Source URL
+* Whether the source URL is valid
+* Canonicalized URL
+* Whether the source URL is unique
+* Whether the canonicalized URL is unique
+
+***
 # URL Validation, Canonicalization, and Comparator Design
 ## Definition of the Valid Form
 A string is considered a valid URL if it matches the following regular expression: [Django source code](https://github.com/django/django/blob/stable/1.3.x/django/core/validators.py#L45).
@@ -85,7 +98,7 @@ Valid URLs
 For more specific information about specific number and types of characters allowed in each component,
 see the URL regex in `urltools/validator.py`
 
-Note that under this regex the strings "www.google.com" or "google.com" will not be considered valid URLs because they do not start with 'http|https|ftp|ftps'.  We decided that this is fine because these strings are not complete URLs and only work in browsers because the browser infers the missing parts.
+Note that under this regex the strings `www.google.com` or `google.com` will not be considered valid URLs because they do not start with 'http|https|ftp|ftps'.  We decided that this is fine because these strings are not complete URLs and only work in browsers because the browser infers the missing parts.
 
 ## Validator
 Validation is performed through a validator module. This module contains the regex specified in the valid form definition. The interface includes:
@@ -97,10 +110,10 @@ Validation is performed through a validator module. This module contains the reg
 The following normalizations are performed in the order shown (The first four are guaranteed to preserve semantics):
 * convert scheme and host to lowercase
 * capitalize letters in escape sequences
-* remove the default port
 * decoding percent-encoded octets of unreserved characters (e.g. "%7E" becomes ~)
-* add trailing slash
-* remove dot segments
+* remove the default port for the subset of schemes considered valid (http:80, https:443, ftp:21, ftps:990)
+* add trailing slash if the url path ends in a directory
+* remove and resolve dot segments `.` and `..`
 * remove empty query string
 
 While this list is by no means exhaustive, we feel that this will cover a good amount of normal use cases based on our prior experiences with URLs, so we decided on these 7 actions.  We included all of the normalizations that will preserve semantics (as according to Wikipedia), 2 normalizations that usually preserve semantics, and one that may change semantics.  We feel that the last one (removing empty query strings) is probably ok in most cases based on prior experiences with websites.
@@ -111,7 +124,7 @@ Canonicalization is performed through a normalizer module. This module contains 
 `normalize(url)`: Given a URL, returns the normalized form of the URL  
 `normalize_list(url)`: Given a list of URLs, returns a new list containing the normalized forms
 
-If given any invalid URLs, the normalizer may not guarantee that the returned results are in the canonicalized form as defined.
+If given any invalid URLs, the normalizer may not guarantee that the returned results are in the canonicalized form as defined, since we don't consider canonicalizing an invalid URL to be a use case.
 
 ## Comparators
 URLs are compared in the same manner as strings. While it may be useful to implement something more specific to URLs (possibly ignoring the scheme, such that `ftp://example.com` and `http://example.com` would be ordered similarly alphabetically), it seems intuitive enough to use the basic string operators already implemented by our sorting functions. The sorting functions support two different comparators:
@@ -122,5 +135,5 @@ URLs are compared in the same manner as strings. While it may be useful to imple
     - `a > b` is true when `a` is longer in length than `b`
 * Order alphabetically (standard Python comparison operators)  
     - `a < b` is true when `a` alphabetically precedes `b`
-    - `a == b` is true when `a` has the same alphabetical order `b`
+    - `a == b` is true when all the characters in `a` have the same value and position as the characters in `b`
     - `a > b` is true when `a` alphcabetically succeeds `b`
