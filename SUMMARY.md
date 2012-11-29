@@ -67,7 +67,8 @@ We divided the url sorting exercise into the following tasks:
 The usage of the program is: `validateUrls.py -i <input file> [-c <comparison function>]`
 
 Give an input file listing URLs on each line, the program validates and normalizes the URLs.  
-Specifying a comparator (for determining if a URL is unique) is optional. Possible comparators are {alpha, length}. The default comparator is alpha.  
+Specifying a comparator (for determining if a URL is unique) is optional. Possible comparators are `alpha` and `length`. The default comparator is `alpha`.
+
 For each URL, the following information is printed to console:
 
 * Source URL
@@ -98,7 +99,7 @@ Valid URLs
 For more specific information about specific number and types of characters allowed in each component,
 see the URL regex in `urltools/validator.py`
 
-Note that under this regex the strings `www.google.com` or `google.com` will not be considered valid URLs because they do not start with 'http|https|ftp|ftps'.  We decided that this is fine because these strings are not complete URLs and only work in browsers because the browser infers the missing parts.
+Note that under this regex the strings `www.google.com` or `google.com` will not be considered valid URLs because they do not start with `http|https|ftp|ftps`.  We decided that this is fine because these strings are not complete URLs and only work in browsers because the browser infers the missing parts.
 
 ## Validator
 Validation is performed through a validator module. This module contains the regex specified in the valid form definition. The interface includes:
@@ -107,13 +108,13 @@ Validation is performed through a validator module. This module contains the reg
 `valid_list(url)`: Given a list of strings, returns a new list of strings of valid URLs only
 
 ## Definition of the Canonical Form
-The following normalizations are performed in the order shown (The first four are guaranteed to preserve semantics):
+The following normalizations are performed in the order shown (the first four are guaranteed to [preserve semantics](http://en.wikipedia.org/wiki/URL_normalization#Normalizations_that_Preserve_Semantics)):
 * convert scheme and host to lowercase
 * capitalize letters in escape sequences
-* decoding percent-encoded octets of unreserved characters (e.g. "%7E" becomes ~)
-* remove the default port for the subset of schemes considered valid (http:80, https:443, ftp:21, ftps:990)
-* add trailing slash if the url path ends in a directory
+* decoding percent-encoded octets of unreserved characters (e.g. `%7E` becomes `~`)
+* remove the default port for the subset of schemes considered valid (`http:80, https:443, ftp:21, ftps:990`)
 * remove and resolve dot segments `.` and `..`
+* add trailing slash if the url path ends in a directory
 * remove empty query string
 
 While this list is by no means exhaustive, we feel that this will cover a good amount of normal use cases based on our prior experiences with URLs, so we decided on these 7 actions.  We included all of the normalizations that will preserve semantics (as according to Wikipedia), 2 normalizations that usually preserve semantics, and one that may change semantics.  We feel that the last one (removing empty query strings) is probably ok in most cases based on prior experiences with websites.
