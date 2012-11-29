@@ -3,32 +3,7 @@
 import sys
 import argparse
 from urltools import validator, normalizer
-from sortfunctions import *
-
-
-def insertionsort(*args):
-    return insertionSort.InsertionSort(*args)
-
-def mergesort(*args):
-    return mergeSort.MergeSort(*args)
-
-def quicksort(*args):
-    return quickSort.QuickSort(*args)
-
-def bucketsort(*args):
-    return bucketSort.BucketSort(*args)
-
-def selectionsort_alphabetical(*args):
-    return alphabeticalSelectionSort.AlphabeticalSelectionSort(*args)
-
-def radixsort_alphabetical(*args):
-    return alphabeticalRadixSort.AlphabeticalRadixSort(*args)
-
-def mergesort_alphabetical(*args):
-    return alphabeticalMergeSort.AlphabeticalMergeSort(*args)
-
-def heapsort_alphabetical(*args):
-    return alphabeticalHeapSort.AlphabeticalHeapSort(*args)
+from sortlib import *
 
 
 """
@@ -55,8 +30,8 @@ if __name__ == "__main__":
                         help='the sorting algorithm. \
                         Must be an integer. possible values are:\n' +
                         '\n'.join(['%d:%s' % (k, algos[k].__name__) for k in algos.keys()]) )
-    parser.add_argument('-k', '--kind', help='kind of urls to sort',
-                        choices=['valid', 'invalid', 'None']);
+    parser.add_argument('-f', '--filter', help='filter on which urls to sort',
+                        choices=['valid', 'invalid']);
     args = parser.parse_args()
 
     outfile = None
@@ -78,20 +53,17 @@ if __name__ == "__main__":
     if args.sort is not None: # try getting sort selection from command-line args
         sel = args.sort
 
-    # remove trailing '\n' from urls
-    urls = [x.rstrip('\n') for x in urls]
+    # remove leading/trailing whitespace from urls
+    urls = [x.strip() for x in urls]
 
-    # normalize and validate urls, if desired
-    normUrls = normalizer.normalize(urls)
-    validUrls = validator.validate(normUrls)
-    if args.kind == "valid":
-        urls = validUrls
-    elif args.kind == "invalid":
-        urls = filter(lambda x: x not in validUrls, normUrls)
+    # normalize and validate urls, if specified
+    if args.filter is not None:
+        validUrls = validator.valid_list(urls)
+        if args.filter == 'valid':
+            urls = normalizer.normalize_list(validUrls)
+        elif args.filter == 'invalid':
+            urls = filter(lambda x: x not in validUrls, urls)
 
     sorter = algos[sel](urls)
     sortedList = sorter.sort()
     outfile.write("\n".join(sortedList))
-
-
-# vim: set ai et ts=4 sw=4 sts=4 :

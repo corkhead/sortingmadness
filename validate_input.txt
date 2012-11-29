@@ -1,0 +1,8 @@
+http://localhost:8000
+http://LocalHOst:8000
+http://stuff.com/path
+http://stuff.com/path/
+http://stuff.com/path/     
+http://stuff.com/path/?
+http://example.com
+http://example.com/?ans=42

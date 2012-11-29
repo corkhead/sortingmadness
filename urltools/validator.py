@@ -11,6 +11,11 @@ URLregex= re.compile(
           r'(?::\d+)?' # optional port
           r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-def validate(urls):
-    return [url for url in urls if re.search(URLregex, url) is not None]
+# Given a string, returns whether the string is a valid URL
+def is_valid(url):
+    return re.search(URLregex, url) is not None
+
+# Given a list of strings, returns the set of strings that are valid URLs
+def valid_list(urls):
+    return [url for url in urls if is_valid(url)]
 

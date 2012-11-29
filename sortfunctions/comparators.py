@@ -10,6 +10,15 @@ Returns:
     positive integer if the first succeeds the second
 """
 
-# Orders elements by their length.
+# Orders strings by their length.
 def length(a, b):
     return len(a) - len(b)
+
+# Orders strings alphabetically
+def alpha(a, b):
+    if (a < b):
+        return -1
+    elif (a == b):
+        return 0
+    else:
+        return 1
