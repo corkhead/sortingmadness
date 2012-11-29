@@ -113,7 +113,7 @@ The following normalizations are performed in the order shown (the first four ar
 * capitalize letters in escape sequences
 * decoding percent-encoded octets of unreserved characters (e.g. `%7E` becomes `~`)
 * remove the default port for the subset of schemes considered valid (`http:80, https:443, ftp:21, ftps:990`)
-* remove and resolve dot segments `.` and `..`
+* remove and resolve dot segments `.` and `..` as well as additional trailing slashes
 * add trailing slash if the url path ends in a directory
 * remove empty query string
 
